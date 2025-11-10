@@ -1,0 +1,50 @@
+# Step 1: Import libraries
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# Step 2: Load dataset
+df = pd.read_csv("Churn_Modelling.csv")
+print("Dataset loaded successfully")
+print(df.head())
+
+# Step 3: Select features and target
+X = df[['CreditScore', 'Age', 'Tenure', 'Balance',
+        'NumOfProducts', 'HasCrCard', 'IsActiveMember', 'EstimatedSalary']].values
+y = df['Exited'].values
+
+# Step 4: Split dataset into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=0
+)
+
+# Step 5: Normalize (scale) the data
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Step 6: Build the Neural Network model
+model = Sequential([
+    Dense(16, activation='relu', input_dim=X_train.shape[1]),  # Input + Hidden Layer 1
+    Dense(8, activation='relu'),                               # Hidden Layer 2
+    Dense(1, activation='sigmoid')                             # Output Layer
+])
+
+# Step 7: Compile the model
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Step 8: Train the model
+history = model.fit(X_train, y_train, epochs=50, batch_size=32, verbose=1)
+
+# Step 9: Evaluate model on test data
+y_pred = model.predict(X_test)
+y_pred = (y_pred > 0.5)  # Convert probabilities to 0 or 1
+
+# Step 10: Display performance
+print("\nAccuracy:", accuracy_score(y_test, y_pred))
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))

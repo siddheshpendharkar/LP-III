@@ -1,0 +1,76 @@
+# Step 1: Import Required Libraries
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Step 2: Load Dataset
+df = pd.read_csv("sales_data_sample.csv" , encoding='latin1')
+print("Initial Shape:", df.shape)
+print(df.head())
+print(df.info())
+print(df.isnull().sum())
+
+# Step 3: Remove non-useful / text columns
+drop_cols = ['ADDRESSLINE1','ADDRESSLINE2','STATUS','POSTALCODE','CITY',
+             'TERRITORY','PHONE','STATE','CONTACTFIRSTNAME','CONTACTLASTNAME',
+             'CUSTOMERNAME','ORDERNUMBER','ORDERDATE']
+
+df = df.drop(drop_cols, axis=1)
+print("Shape After Dropping Columns:", df.shape)
+df.head()
+
+# Step 4: Handle Categorical Variables (One-Hot Encoding)
+df = pd.get_dummies(df, columns=['COUNTRY','PRODUCTLINE','DEALSIZE'], drop_first=True)
+# Step 5: Convert PRODUCTCODE to numeric codes
+df['PRODUCTCODE'] = pd.Categorical(df['PRODUCTCODE']).codes
+df.head()
+# Step 6: Normalize Data (Important for K-Means)
+from sklearn.preprocessing import Normalizer
+normalizer = Normalizer()
+df_scaled = normalizer.fit_transform(df)
+
+df_scaled = pd.DataFrame(df_scaled, columns=df.columns)
+# Step 7: Elbow Method (Matches EXACT Plot in PDF)
+from sklearn.cluster import KMeans
+
+distortion = []
+K = range(1, 10)
+
+for k in K:
+    kmeans = KMeans(n_clusters=k, random_state=0)
+    kmeans.fit(df_scaled)
+    distortion.append(kmeans.inertia_)
+
+plt.figure(figsize=(10,5))
+plt.plot(K, distortion, 'bx-')   # Blue line with x marker (same as PDF)
+plt.xlabel('k')
+plt.ylabel('Distortion')
+plt.title('The Elbow Method showing the optimal k')
+plt.show()
+
+# Step 8: Apply K-Means with optimal k = 3
+kmeans = KMeans(n_clusters=3, random_state=0)
+df_scaled['Cluster'] = kmeans.fit_predict(df_scaled)
+
+print("Cluster Count:")
+print(df_scaled['Cluster'].value_counts())
+
+# Step 9: Visualizing Clusters
+plt.figure(figsize=(10,6))
+plt.scatter(df_scaled['SALES'], df_scaled['QUANTITYORDERED'], 
+            c=df_scaled['Cluster'], cmap='viridis')
+plt.xlabel("Sales")
+plt.ylabel("Quantity Ordered")
+plt.title("Sales vs Quantity Ordered - Cluster Visualization")
+plt.show()
+
+
+plt.figure(figsize=(30, 26))
+sns.heatmap(df.corr(numeric_only=True), 
+            annot=True, 
+            cmap="magma", 
+            linewidths=1.2, 
+            square=True)
+plt.title("Correlation Heatmap", fontsize=28, weight="bold")
+plt.show()

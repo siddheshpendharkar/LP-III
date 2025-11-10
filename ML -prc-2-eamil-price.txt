@@ -1,0 +1,102 @@
+
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load Dataset
+df = pd.read_csv("emails.csv")
+print("Dataset Shape:", df.shape)
+df.head()
+
+# Input (X) and Output (y)
+X = df.drop(['Email No.', 'Prediction'], axis=1)
+y = df['Prediction']
+
+print("Input Shape:", X.shape)
+print("Output Shape:", y.shape)
+
+# Check Class Balance
+sns.countplot(x=y)
+plt.title("Spam vs Ham Email Distribution")
+plt.show()
+
+print("\nClass Frequency:")
+print(y.value_counts())
+
+# -----------------------
+# Feature Scaling
+# -----------------------
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+print("\nScaled Data Example:")
+print(X_scaled)
+
+# -----------------------
+# Train-Test Split
+# -----------------------
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.25, random_state=0)
+
+print("\nTraining Data Shape:", X_train.shape)
+print("Testing Data Shape:", X_test.shape)
+
+# -----------------------
+# KNN Classifier
+# -----------------------
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
+
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+
+y_pred_knn = knn.predict(X_test)
+
+print("\n--- KNN Model Results ---")
+print("Accuracy:", accuracy_score(y_test, y_pred_knn))
+print("\nClassification Report:\n", classification_report(y_test, y_pred_knn))
+
+cm_knn = confusion_matrix(y_test, y_pred_knn)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm_knn)
+disp.plot()
+plt.title("KNN Confusion Matrix")
+plt.show()
+
+# -----------------------
+# SVM (RBF Kernel)
+# -----------------------
+from sklearn.svm import SVC
+
+svm_rbf = SVC(kernel='rbf')
+svm_rbf.fit(X_train, y_train)
+y_pred_rbf = svm_rbf.predict(X_test)
+
+print("\n--- SVM (RBF Kernel) Results ---")
+print("Accuracy:", accuracy_score(y_test, y_pred_rbf))
+print("\nClassification Report:\n", classification_report(y_test, y_pred_rbf))
+
+cm_rbf = confusion_matrix(y_test, y_pred_rbf)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm_rbf)
+disp.plot()
+plt.title("SVM RBF Confusion Matrix")
+plt.show()
+
+# -----------------------
+# SVM (Linear Kernel) - Best
+# -----------------------
+svm_linear = SVC(kernel='linear')
+svm_linear.fit(X_train, y_train)
+y_pred_linear = svm_linear.predict(X_test)
+
+print("\n--- SVM (Linear Kernel) Results ---")
+print("Accuracy:", accuracy_score(y_test, y_pred_linear))
+print("\nClassification Report:\n", classification_report(y_test, y_pred_linear))
+
+cm_linear = confusion_matrix(y_test, y_pred_linear)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm_linear)
+disp.plot()
+plt.title("SVM Linear Confusion Matrix")
+plt.show()

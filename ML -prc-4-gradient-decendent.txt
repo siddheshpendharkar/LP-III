@@ -1,0 +1,44 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Step 1: Define the function
+def function(x):
+    return (x + 3)**2
+
+# Step 2: Define its derivative
+def derivative(x):
+    return 2*(x + 3)
+
+# Step 3: Gradient Descent Function
+def gradient_descent(starting_point, learning_rate, iterations):
+    x = starting_point
+    history = []   # store values to show how x moves during descent
+    for i in range(iterations):
+        x = x - learning_rate * derivative(x)
+        history.append(x)
+    return x, history
+
+# Step 4: Set Parameters
+start = 2             # initial guess
+lr = 0.1              # learning rate
+steps = 50            # number of iterations
+
+# Step 5: Run Gradient Descent
+minimum_x, path = gradient_descent(start, lr, steps)
+
+# Step 6: Output the result
+print("Minimum value of function occurs at x =", round(minimum_x, 4))
+print("Function value at minimum =", round(function(minimum_x), 4))
+
+# Step 7: Plot the function & descent path
+x_vals = np.linspace(-8, 4, 100)
+y_vals = function(x_vals)
+
+plt.plot(x_vals, y_vals, label="f(x) = (x + 3)²")
+plt.scatter(path, function(np.array(path)), color="red", label="Descent Steps")
+plt.xlabel("x")
+plt.ylabel("f(x)")
+plt.title("Gradient Descent Path to Minimum")
+plt.legend()
+plt.grid(True)
+plt.show()
