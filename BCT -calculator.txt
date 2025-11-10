@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Calculator {
+    // Public variables a and b with initial values
+    uint public a = 6;
+    uint public b = 5;
+
+    // Pure functions for basic arithmetic operations
+    function sum(uint _a, uint _b) public pure returns (uint) {
+        return _a + _b;
+    }
+    
+    function subtract(uint _a, uint _b) public pure returns (uint) {
+        require(_b <= _a, "Subtraction would result in a negative number");
+        return _a - _b;
+    }
+    
+    function multiply(uint _a, uint _b) public pure returns (uint) {
+        return _a * _b;
+    }
+    
+    function divide(uint _a, uint _b) public pure returns (uint) {
+        require(_b > 0, "Division by zero is not allowed");
+        return _a / _b;
+    }
+
+    // Calling functions and storing the results in state variables
+    function getAddition() public view returns (uint) {
+        return sum(a, b);
+    }
+    
+    function getSubtraction() public view returns (uint) {
+        return subtract(a, b);
+    }
+    
+    function getMultiplication() public view returns (uint) {
+        return multiply(a, b);
+    }
+    
+    function getDivision() public view returns (uint) {
+        return divide(a, b);
+    }
+}

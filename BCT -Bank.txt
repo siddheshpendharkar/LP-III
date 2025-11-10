@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract Bank {
+    
+    struct Person {
+        uint256 account_no;
+        uint256 balance;
+    }
+    
+    mapping(uint256 => Person) private accounts;
+
+    function addPerson(uint256 acc_no, uint256 bal) public {
+        require(accounts[acc_no].account_no == 0, "Account already exists");
+        accounts[acc_no] = Person(acc_no, bal);
+    }
+    
+    function depositMoney(uint256 acc_no, uint256 amt) public returns (string memory) {
+        require(accounts[acc_no].account_no != 0, "Account not found");
+        accounts[acc_no].balance += amt;
+        return "success";
+    }
+    
+    function withdraw(uint256 acc_no, uint256 amt) public returns (string memory) {
+        require(accounts[acc_no].account_no != 0, "Account not found");
+        require(amt <= accounts[acc_no].balance, "Insufficient funds");
+        accounts[acc_no].balance -= amt;
+        return "success";
+    }
+    
+    function showBalance(uint256 acc_no) public view returns (uint256) {
+        require(accounts[acc_no].account_no != 0, "Account not found");
+        return accounts[acc_no].balance;
+    }
+
+    function transfer(uint256 ac1, uint256 ac2, uint256 amt) public returns (string memory) {
+        require(accounts[ac1].account_no != 0, "Sender account not found");
+        require(accounts[ac2].account_no != 0, "Receiver account not found");
+        require(amt <= accounts[ac1].balance, "Insufficient funds");
+
+        accounts[ac1].balance -= amt;
+        accounts[ac2].balance += amt;
+        return "transfer successful";
+    }
+}
