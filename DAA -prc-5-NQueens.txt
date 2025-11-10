@@ -1,0 +1,87 @@
+package NqueensDemo;
+
+
+
+
+
+import java.util.Scanner;
+
+public class Nqueens {
+    static int N;
+
+    // Function to print the chessboard
+    static void printBoard(int[][] board) {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (board[i][j] == 1)
+                    System.out.print(" Q ");
+                else
+                    System.out.print(" . ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    // Function to check if placing a Queen at (row, col) is safe
+    static boolean isSafe(int[][] board, int row, int col) {
+
+        // Check left side of same row
+        for (int j = 0; j < col; j++) {
+            if (board[row][j] == 1)
+                return false;
+        }
+
+        // Check upper-left diagonal
+        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+            if (board[i][j] == 1)
+                return false;
+        }
+
+        // Check lower-left diagonal
+        for (int i = row, j = col; i < N && j >= 0; i++, j--) {
+            if (board[i][j] == 1)
+                return false;
+        }
+
+        return true; // Safe position
+    }
+
+    // Recursive function to solve NQueens
+    static boolean solve(int[][] board, int col) {
+
+        // If all queens are placed
+        if (col == N) {
+            printBoard(board);
+            return true; // Found a solution
+        }
+
+        boolean solutionFound = false;
+
+        // Try placing a queen in each row of the current column
+        for (int row = 0; row < N; row++) {
+
+            if (isSafe(board, row, col)) {
+                board[row][col] = 1; // Place the queen
+                solutionFound = solve(board, col + 1) || solutionFound;
+                board[row][col] = 0; // Backtrack (remove the queen)
+            }
+        }
+
+        return solutionFound;
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter value of N: ");
+        N = sc.nextInt();
+
+        int[][] board = new int[N][N];
+
+        if (!solve(board, 0)) {
+            System.out.println("No solution exists for N = " + N);
+        }
+    }
+}
+

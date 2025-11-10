@@ -1,0 +1,55 @@
+package exam;
+
+
+
+import java.util.Scanner;
+
+public class fibonacci {
+
+    static int recursiveSteps = 0;
+    static int nonRecursiveSteps = 0;
+
+    public static int fibonacciRecursive(int n) {
+        recursiveSteps++;
+        if (n <= 1) return n;
+        return fibonacciRecursive(n - 1) + fibonacciRecursive(n - 2);
+    }
+
+    public static int fibonacciNonRecursive(int n) {
+        if (n <= 1) {
+            nonRecursiveSteps++;
+            return n;
+        }
+
+        int prev = 0, curr = 1;
+        nonRecursiveSteps = 1;
+
+        for (int i = 2; i <= n; i++) {
+            nonRecursiveSteps++;
+            int next = prev + curr;
+            prev = curr;
+            curr = next;
+        }
+        return curr;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter the value of n: ");
+        int n = sc.nextInt();
+
+        recursiveSteps = 0;
+        int fibRec = fibonacciRecursive(n);
+
+        nonRecursiveSteps = 0;
+        int fibNonRec = fibonacciNonRecursive(n);
+
+        System.out.println("\nFibonacci number at position " + n);
+        System.out.println("Recursive Result: " + fibRec);
+        System.out.println("Recursive Steps: " + recursiveSteps);
+        System.out.println("\nNon-Recursive Result: " + fibNonRec);
+        System.out.println("Non-Recursive Steps: " + nonRecursiveSteps);
+
+        sc.close();
+    }
+}

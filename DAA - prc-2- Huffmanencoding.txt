@@ -1,0 +1,104 @@
+package Huffman;
+
+
+import java.util.*;
+
+class HuffmanNode {
+    char ch;
+    int frequency;
+    HuffmanNode left;
+    HuffmanNode right;
+
+    HuffmanNode(char ch, int frequency) {
+        this.ch = ch;
+        this.frequency = frequency;
+        this.left = null;
+        this.right = null;
+    }
+
+    HuffmanNode(int frequency, HuffmanNode left, HuffmanNode right) {
+        this.ch = '\0'; // Internal node
+        this.frequency = frequency;
+        this.left = left;
+        this.right = right;
+    }
+}
+
+class FrequencyComparator implements Comparator<HuffmanNode> {
+    public int compare(HuffmanNode n1, HuffmanNode n2) {
+        return Integer.compare(n1.frequency, n2.frequency);
+    }
+}
+
+public class huffman {
+
+    // Generate Huffman codes from the root of the tree
+    public static void generateCodes(HuffmanNode root, String code, Map<Character, String> huffmanCodes) {
+        if (root == null)
+            return;
+
+        // If it's a leaf node
+        if (root.left == null && root.right == null) {
+            huffmanCodes.put(root.ch, code);
+        }
+
+        generateCodes(root.left, code + "0", huffmanCodes);
+        generateCodes(root.right, code + "1", huffmanCodes);
+    }
+
+    // Build the Huffman Tree and generate codes
+    public static Map<Character, String> huffmanEncoding(char[] chars, int[] frequencies) {
+        PriorityQueue<HuffmanNode> pq = new PriorityQueue<>(new FrequencyComparator());
+
+        // Step 1: Create a leaf node for each character and add to priority queue
+        for (int i = 0; i < chars.length; i++) {
+            pq.offer(new HuffmanNode(chars[i], frequencies[i]));
+        }
+
+        // Step 2: Merge nodes until only one remains
+        while (pq.size() > 1) {
+            HuffmanNode left = pq.poll();
+            HuffmanNode right = pq.poll();
+
+            HuffmanNode merged = new HuffmanNode(left.frequency + right.frequency, left, right);
+            pq.offer(merged);
+        }
+
+        // Root of the tree
+        HuffmanNode root = pq.poll();
+
+        // Generate codes
+        Map<Character, String> huffmanCodes = new HashMap<>();
+        generateCodes(root, "", huffmanCodes);
+        return huffmanCodes;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of characters: ");
+        int n = sc.nextInt();
+
+        char[] characters = new char[n];
+        int[] frequencies = new int[n];
+
+        System.out.println("Enter characters and their frequencies:");
+        for (int i = 0; i < n; i++) {
+            System.out.print("Character " + (i + 1) + ": ");
+            characters[i] = sc.next().charAt(0);
+
+            System.out.print("Frequency for " + characters[i] + ": ");
+            frequencies[i] = sc.nextInt();
+        }
+
+        Map<Character, String> huffmanCodes = huffmanEncoding(characters, frequencies);
+
+        System.out.println("\nHuffman Codes:");
+        for (Map.Entry<Character, String> entry : huffmanCodes.entrySet()) {
+            System.out.println(entry.getKey() + " → " + entry.getValue());
+        }
+
+        sc.close();
+    }
+}
+

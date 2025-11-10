@@ -1,0 +1,76 @@
+package fractionnapsakDemo;
+
+
+
+
+import java.util.*;
+
+class Item {
+    int value, weight;
+
+    Item(int value, int weight) {
+        this.value = value;
+        this.weight = weight;
+    }
+}
+
+public class fractionalnapsack {
+
+    // Comparator to sort items by value/weight ratio in descending order
+    static class ItemComparator implements Comparator<Item> {
+        public int compare(Item a, Item b) {
+            double ratio1 = (double) a.value / a.weight;
+            double ratio2 = (double) b.value / b.weight;
+            return Double.compare(ratio2, ratio1); // Sort in descending order
+        }
+    }
+
+    public static double getMaxValue(Item[] items, int capacity) {
+        // Sort items based on ratio
+        Arrays.sort(items, new ItemComparator());
+
+        double totalValue = 0;
+
+        for (Item item : items) {
+            if (capacity == 0)
+                break;
+
+            if (item.weight <= capacity) {
+                // Take the full item
+                capacity -= item.weight;
+                totalValue += item.value;
+            } else {
+                // Take fraction of the item
+                double fraction = (double) capacity / item.weight;
+                totalValue += item.value * fraction;
+                capacity = 0; // Knapsack full
+            }
+        }
+        return totalValue;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number of items: ");
+        int n = sc.nextInt();
+
+        Item[] items = new Item[n];
+
+        System.out.println("Enter value and weight for each item:");
+        for (int i = 0; i < n; i++) {
+            System.out.print("Value of item " + (i+1) + ": ");
+            int value = sc.nextInt();
+            System.out.print("Weight of item " + (i+1) + ": ");
+            int weight = sc.nextInt();
+            items[i] = new Item(value, weight);
+        }
+
+        System.out.print("Enter capacity of knapsack: ");
+        int capacity = sc.nextInt();
+
+        double maxValue = getMaxValue(items, capacity);
+        System.out.println("\nMaximum value in Knapsack = " + maxValue);
+    }
+}
+
